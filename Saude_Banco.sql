@@ -86,3 +86,28 @@ SELECT
 FROM dba_data_files
 WHERE TABLESPACE_NAME = 'DATA_RNSCOPA'
 ORDER BY tablespace_name;
+
+-------------------------------------------
+
+SELECT S.SID "SID"
+     ,S.STATUS "Status"
+     ,P.SPID "O.S. SID"
+     ,S.SERIAL# "Serial #"
+     ,S.TYPE "Type"
+     ,decode(s.username,NULL, bg.name,s.username) "DB User"
+     ,S.OSUSER "Client User"
+     ,s.logon_time "Logon Time"
+     ,S.SERVER "Server"
+     ,S.MACHINE "Machine"
+     ,S.TERMINAL "Terminal"
+     ,S.PROGRAM "Program"
+     ,P.PROGRAM "O.S. Program"
+     ,decode(s.lockwait, NULL, 'NO', 'YES') "BLOCKED?"
+     ,DECODE(COMMAND, 1, 'CREATE TABLE', 2, 'INSERT', 3, 'SELECT', 4, 'CREATE CLUSTER', 5, 'ALTER CLUSTER', 6, 'UPDATE', 7, 'DELETE', 8, 'DROP', 9, 'CREATE INDEX', 10, 'DROP INDEX', 11, 'ALTER INDEX', 12, 'DROP TABLE', 15, 'ALTER TABLE', 17, 'GRANT', 18, 'REVOKE', 19, 'CREATE SYNONYM', 20, 'DROP SYNONYM', 21, 'CREATE VIEW', 22, 'DROP VIEW', 26, 'LOCK TABLE', 27, 'NO OPERATION', 28, 'RENAME', 29, 'COMMENT', 30, 'AUDIT', 31, 'NOAUDIT', 32, 'CREATE EXTERNAL DATABASE', 33, 'DROP EXTERNAL DATABASE', 34, 'CREATE DATABASE', 35, 'ALTER DATABASE', 36, 'CREATE ROLLBACK SEGMENT', 37, 'ALTER ROLLBACK SEGMENT', 38, 'DROP ROLLBACK SEGMENT', 39, 'CREATE TABLESPACE', 40, 'ALTER TABLESPACE', 41, 'DROP TABLESPACE', 42, 'ALTER SESSION', 43, 'ALTER USER', 44, 'COMMIT', 45, 'ROLLBACK', 46, 'SAVEPOINT', 'UNKNOWN') "Command"
+     ,s.last_call_et "Seconds Idle Since Last Call"
+FROM  V$SESSION S
+    ,V$PROCESS P
+    ,V$BGPROCESS BG
+WHERE  S.paddr = P.addr
+and   BG.paddr(+) = S.paddr
+ORDER BY 2
